@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="{% static 'profile/register.css' %}">
+
+{% endblock %}
+
+
+{% block menu %}
+{% endblock %}
+
+{% block slider %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+      <div class="row centered-form">
+        <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Please sign up for our market</h3>
+            </div>
+
+            <div class="panel-body">
+                  <form method="post" role="form" >
+                    {% csrf_token %}
+
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.first_name.label_tag }}
+                          {{ form.first_name }}
+                          
+                        </div>
+
+                      </div>
+
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.last_name.label_tag }}
+                          {{ form.last_name }}
+                        </div>
+
+                      </div>
+                    </div>
+
+                     <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.username.label_tag }}
+                          {{ form.username }}
+                          {% if form.username.errors %}
+                                {{ form.username.errors }}
+                          {% endif %}
+                        </div>
+
+                      </div>
+
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.email.label_tag }}
+                          {{ form.email }}
+                                                    {% if form.username.errors %}
+                          <small style="color: red">{{ form.username.errors }}</small>
+                          {% endif %}
+                          
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                     <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.mobile.label_tag }}
+                          {{ form.mobile }}
+                                                    {% if form.mobile.errors %}
+                          <small style="color: red">{{ form.mobile.errors }}</small>
+                          {% endif %}
+                          <small style="display: none">{{ form.mobile.help_text }}</small>
+                          
+                        </div>
+
+                      </div>
+
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.birth_day.label_tag }}
+                          {{ form.birth_day }}
+                      
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.password1.label_tag }}
+                          {{ form.password1 }}
+                        </div>
+
+                      </div>
+
+                      <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-group">
+                          {{ form.password2.label_tag }}
+                          {{ form.password2 }}
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <input type="submit" value="S'inscrire" name="" class="btn btn-info btn-block">
+
+
+
+
+                  </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+     </div>
+  {% endblock %}
+
+
+
+  {% block sidbar %}
+  {% endblock %}

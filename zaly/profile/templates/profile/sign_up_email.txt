@@ -1,0 +1,3 @@
+Bienvenue sur nimba marché, Avec vous le monde nous pouvons rendre le monde meillieur.
+Pour activer le compte cliquez ce lien:
+http://127.0.0.1:8000/profile/connexion

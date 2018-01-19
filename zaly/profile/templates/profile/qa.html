@@ -1,0 +1,30 @@
+{% extends "account/base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+ 
+ {% if user.is_authenticated %}
+
+<p>
+	Il est authetifié
+</p>
+{% else %}
+    <form action="{% url 'login' %}" method="POST">
+    	{% csrf_token %}
+    	{{ form|crispy }}
+    	<input type="submit" value="Connexion">
+    </form>
+{% endif %}
+<p>
+	Pour modifier votre profile c'est par <a href="#">Ici tout se passe</a> <br>
+    	Pour modifier votre profile c'est par <a href="{% url 'account_change_password' %}">Mot de passe</a>
+
+</p>
+<p>
+	<a href="{% url 'account_login' %}">Sign in</a>
+</p>
+
+<strong>{{ request.user.username }}</strong>
+{% endblock %}
+

@@ -1,0 +1,43 @@
+body {
+	padding-top:70px;
+
+}
+.navbar-inverse{
+	background-color: green;
+}
+#nav{
+	background-color: red;
+}
+
+.container {
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.col-lg-offset-6{
+	margin-left: 50%;
+}
+
+
+
+@media (min-width: 768px){
+	.container{
+		width: 750px;
+	}
+}
+
+
+@media (min-width: 992px){
+	.container {
+		width: 970px;
+	}
+}
+
+
+@media (min-width: 1200px){
+	.container {
+		width: 1170px;
+	}
+}

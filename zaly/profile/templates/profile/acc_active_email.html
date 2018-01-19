@@ -1,0 +1,6 @@
+{% autoescape off %}
+
+Salut {{ user.username }},
+Please cliquez sur ce lien pour confirmer votre inscription,
+http://127.0.0.1:8000{% url 'profile:active' uidb64=uid token=token %}
+{% endautoescape %}
