@@ -25,11 +25,10 @@ urlpatterns = [
                 # url(r'^logout/$', logout, name="logout"),
 
 
-                re_path(r'register/$', register, name="register"),
+                re_path(r'^register/$', register, name="register"),
 
-                re_path(r'activate/(?P<uidb64>[\w\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[\w]{1,20})/$', activate, name="active"),
+                re_path(r'^activate/(?P<uidb64>[\w\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[\w]{1,20})/$', activate, name="active"),
 
-                #url(r'^qlq/$', qlq, name="qlq"),
 
                 # url(r'^login/$',connexion, name="login"),
 

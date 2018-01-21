@@ -22,18 +22,23 @@ from django.contrib import admin
 from django.urls import include, path
 
 
-from .views import home
+from .views import home, detail
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
 
-    path("", home),
+    path("", home, name="home"),
+    path("detail/", detail, name="detail"),
 
 
     path('profile/', include("profile.urls", namespace="profile")),
     path('account/', include("accounts.urls", namespace="accounts")),
+
+
+    path('produits/', include("produits.urls", namespace="produits")),
+
 
 
 ]

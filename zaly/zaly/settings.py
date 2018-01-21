@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'profile',
 
     'market',
-
+    'produits',
 
 
 
