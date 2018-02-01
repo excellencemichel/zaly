@@ -159,24 +159,24 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' #C'est le nom qu'on doit utiliser pour appeler les fichier exemple href="{% static 'css/style.css' %}"
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join( os.path.dirname(BASE_DIR), "static_cdn", "staticfiles")
 
 STATICFILES_DIRS = [
-             os.path.join(BASE_DIR, 'static'),
+             os.path.join( BASE_DIR, 'static'),
 ]
 
 # SITE_ID = 1
 
 MEDIA_URL = "/media/"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media")
+
+PROTECTED_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "protected")
 
 
-
-
-LOGIN_URL = 'login'
+LOGIN_URL = 'accounts:login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home'
 

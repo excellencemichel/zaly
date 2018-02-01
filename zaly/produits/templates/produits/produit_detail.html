@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<strong>Le monde chamboulé selon Diallo Bella</strong>
+	<strong>{{ object.title }}</strong>
+	<p>{{ object.description }}</p>
+
+	<p>{{ object.price }}</p>
+
+	{% if request.user.is_authenticated and object.media and object in request.user.myproduits.produits.all %}
+	
+		<p><a href="{{ object.get_download }}?preview=True">Preview</a></p>
+		<p><a href="{{ object.get_download }}">Download</a></p>
+
+
+	{% endif %}
+
 {% endblock content %}

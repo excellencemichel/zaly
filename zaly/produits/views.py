@@ -1,10 +1,31 @@
-from django.shortcuts import render, get_object_or_404
+import os
+from mimetypes import guess_type
+
+from django.conf import settings
+# from django.core.servers.basehttp import FileWrapper
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
+from django.http import HttpResponse, Http404, FileResponse
 
 from django.core.signals import request_finished, request_started #Pour la gestion des signaux
 from django.dispatch import receiver
+from django.urls import reverse, reverse_lazy
+
 
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView
+
+from zaly.mixins import (
+			MultiSlugMixin, 
+			SubmitBtnMixin,
+			LoginRequiredMixin,
+			StaffRequiredMixin,
+
+
+			)
+
+from .mixins import ProduitManagerMixin
 
 from .forms import ProduitForm, ProduitModelForm
 
@@ -56,8 +77,13 @@ def create_produit_simple(request):
 		description = data.get("description")
 		price = data.get("price")
 
-		new_produit = Produit(title=title, description=description, price=price).save()
-	template = "produits/create_produit_old.html"
+		new_produit = Produit(title=title, description=description, price=price)
+		new_produit.save()
+
+		return redirect (reverse("home"))
+
+
+	template = "produits/create_produit.html"
  
 	context = {
 		"form": form
@@ -70,9 +96,9 @@ def create_produit(request):
 	form = ProduitModelForm(request.POST or None)
 	if form.is_valid():
 		instance = form.save(commit=False)
-		instance.save
+		instance.save()
 
-
+		return redirect (reverse("home"))
 
 	context = {
 		"form":form,
@@ -90,6 +116,8 @@ def update_produit(request, object_id =None, slug=None):
 	if form.is_valid():
 		instance = form.save(commit=False)
 		instance.save()
+
+		return redirect (reverse("home"))
 
 	context = {
 		"form" :form,
@@ -123,12 +151,122 @@ class ProduitListView(ListView):
 		return context
 
 	def get_queryset(self, *args, **kwargs):
-		qs = super(ProduitListView, self).get_queryset(**kwargs)
-		qs = qs.filter(title__icontains="Telephone")
+		"""
+		Cette fonction permet de n'obtenir dans l'affichage
+		les objets qui remplissent les conditions définies ici
+		-contains tient compte de casse(majuscule et miniscule)
+		-icontains permet de passer au travers la casse
+		-Et contains et icontains ne gèrent pas les accent,
+		 Téléphone est différent de Telephone
+
+		 l'ordonancement avec order_by()
+		 	sans le signe moins devant avec les id c'est du plus ancien aux plus recents donc des petit id aux grands id
+		 	avec le signe moins c'est maintenant du plus recent aux plus anciens donc des id grands aux id petits
+		"""
+		qs = super(ProduitListView, self).get_queryset(**kwargs).order_by("-id")
+		query = self.request.GET.get("q")
+		if query:	
+			qs = qs.filter(
+							Q(title__icontains=query)|
+							Q(description__icontains=query)
+
+						  ).order_by("id")
 		return qs
 
 
 
 
-class ProduitDetailView(DetailView):
+class ProduitDetailView(MultiSlugMixin,DetailView):
 	model = Produit
+
+
+
+
+class ProduitCreateView(LoginRequiredMixin,CreateView, SubmitBtnMixin):
+
+	model = Produit
+	template_name = "produits/form.html"
+	form_class = ProduitModelForm
+	# success_url = reverse_lazy("home")
+
+	submit_btn = "Create produit"
+
+	def form_valid(self, form):
+		user = self.request.user
+
+		form.instance.user = user
+		valid_data = super(ProduitCreateView, self).form_valid(form)
+		form.instance.managers.add(user)
+
+		return valid_data
+
+
+	def get_success_url(self):
+		return reverse("produits:list_produit")
+
+
+
+class ProduitUpdateView(LoginRequiredMixin,MultiSlugMixin, SubmitBtnMixin, UpdateView):
+	model = Produit
+
+	template_name = "produits/form.html"
+	form_class = ProduitModelForm
+	# success_url = reverse_lazy("home")
+
+	submit_btn = "Update produit"
+
+
+	# def get_object(self, *args, **kwargs):
+	# 	user = self.request.user
+	# 	obj = super(ProduitUpdateView, self).get_object(*args, **kwargs)
+	# 	if obj.user == user or user in obj.managers.all():
+	# 		return obj
+
+	# 	else:
+	# 		# return HttpResponse("Tu n'es pas membre du club")
+	# 		raise Http404
+	# 		# return redirect (reverse_lazy("home"))
+
+
+
+class ProduitDownloadView(MultiSlugMixin, DetailView):
+	model = Produit
+
+	def get(self, request, *args, **kwargs):
+		"""
+		Pour le téléchargement des fichier
+		A noter que la methoe file proposée dans le cours pour ouvrir
+		les fichier ne marche avec python 3
+		c'est la méthode open avec l'option d'ouverture qui doit utiliser
+		le b l'option bytes pour pouvoir acceder à l'encodage du fichier
+		"""
+		obj = self.get_object()
+		if obj in request.user.myproduits.produits.all():
+
+			filepath = os.path.join(settings.PROTECTED_ROOT, obj.media.path)
+			route = filepath.split(".")
+			extention = route[-1]
+			# print(route)
+
+			# print(type(filepath))
+			guessed_type = guess_type(filepath)[0]
+			print(guessed_type)
+
+			# wrapper = FileResponse(file(filepath)) #ça na marche que pour python2
+			wrapper = FileResponse(open(filepath, "rb"))
+			mimetype = "application/force-download"
+
+			if guessed_type:
+				mimetype = guessed_type
+
+			# response = HttpResponse(file(filepath), content_type="application/force-download") #ça ne marche avec python 3
+			response = HttpResponse(wrapper, content_type=mimetype) # A ne pas oublier le b pour l'encodage
+
+			if not request.GET.get("preview"):
+				response["Content-Disposition"]= "attachement; filename=%s"%(obj.media.name) #Permet de gérer le nom du fichier en téléchargement, si on utilise pas cette fonction le fichier prend le nom par défaut 'tétéchargement' pour un système de nom en français et download pour les anglofone
+			response["X-SendFile"] = str(obj.media.name)
+			return response
+
+		else:
+			raise Http404
+ 

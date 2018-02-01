@@ -1,3 +1,5 @@
+from django.utils.text import slugify
+
 from django import forms
 from .models import Produit
 
@@ -35,6 +37,7 @@ class ProduitModelForm(forms.ModelForm):
 			"title",
 			"description",
 			"price",
+			"media",
 		]
 
 		widgets = {
@@ -51,6 +54,21 @@ class ProduitModelForm(forms.ModelForm):
 			)
 		 }
 
+
+
+	def clean(self, *args, **kwargs):
+		cleaned_data = super(ProduitModelForm, self).clean(*args, **kwargs)
+		# title = cleaned_data.get("title")
+		# slug = slugify(title)
+
+		# qs = Produit.objects.filter(slug=slug).exists()
+
+		# if qs:
+		# 	raise forms.ValidationError("Title is taken, new is needed. Please try again.")
+
+		print (cleaned_data)
+		return cleaned_data
+
 	def clean_price(self):
 		price = self.cleaned_data.get("price")
 		if price <= 1.000:
@@ -61,3 +79,12 @@ class ProduitModelForm(forms.ModelForm):
 
 		else:
 			return price
+
+	def clean_title(self):
+		title = self.cleaned_data.get("title")
+
+		if len(title) > 3:
+			return title
+
+		else:
+			raise forms.ValidationError("The title must be greater than 3 characters long.")

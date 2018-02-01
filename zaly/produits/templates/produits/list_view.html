@@ -1,8 +1,42 @@
 {% extends "base.html" %}
 
 
+{% block style %}
+
+.abc {
+	background-color : red;
+}
+
+.def {
+	background-color: green;
+}
+
+{% endblock style %}
+
+
 {% block content %}
 
-<h3>List view</h3>
+	<h1>Produits :</h1>
+
+	<p>
+		<form method="GET" action="">
+			<input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
+			<input type="submit" name="" value="Search">
+
+		</form>
+	</p>
+	<ul>
+{% for instance in object_list %}
+	<li class="{% cycle 'abc' 'def' '' 'abc' %}"><a href="{% url 'produits:detail_id_slug_view' instance.id instance.slug %}">{{ instance.title|upper }}</a>
+	<br>
+	{{ instance.description|truncatechars:40 }} <br>
+	 {{ instance.price }}</li>
+{% comment %}
+	<!-- <li><a href="{{ instance.get_absolute_url instance.id instance.slug }}">{{ instance.title }}</a> - {{ instance.description }} {{ instance.price }}</li> -->
+{% endcomment %}
+{% empty %}
+    <li>No articles yet.</li>
+{% endfor %}
+</ul>
 
 {% endblock content %}
