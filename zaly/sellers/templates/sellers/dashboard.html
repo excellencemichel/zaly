@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+	<h1>{{ title }}</h1>
+
+
+
+{% if apply_form %}
+<form method="POST" action="">
+	{% csrf_token %}
+	Rules of the Marketplace
+	<h3></h3>
+
+	<ol>
+		<li>Be kind</li>
+		<li>Sell well</li>
+		<li>Don't steal</li>
+	</ol>
+
+	{{ apply_form.as_p }}
+	<input type="submit" name="" value="Evoyer">
+</form>
+
+
+{% endif %}
+
+{% endblock content %}

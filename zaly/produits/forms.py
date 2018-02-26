@@ -3,6 +3,11 @@ from django.utils.text import slugify
 from django import forms
 from .models import Produit
 
+PUBLISH_CHOICES = (
+			("publish", "Publish"),
+			("draft", "Draft"),
+	)
+
 class ProduitForm(forms.Form):
 	title = forms.CharField( widget= forms.TextInput(
 			attrs = {
@@ -24,19 +29,23 @@ class ProduitForm(forms.Form):
 
 		if price <= 1.000:
 			raise forms.ValidationError("Le prix doit être plus que $1.000")
-		elif price >= 99.999:
+		elif price >= 333:
 			raise forms.ValidationError("Le prix ne doit pas être plus que $100.000")
 		else:
 			return price
 
 
 class ProduitModelForm(forms.ModelForm):
+	tags = forms.CharField(label="Related tags", required=False)
+	publish = forms.ChoiceField(widget=forms.RadioSelect, choices=PUBLISH_CHOICES, required=False)
 	class Meta:
 		model = Produit
 		fields = [
 			"title",
 			"description",
 			"price",
+			"tags",
+			"publish",
 			"media",
 		]
 

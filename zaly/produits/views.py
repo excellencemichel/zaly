@@ -31,6 +31,9 @@ from .forms import ProduitForm, ProduitModelForm
 
 from .models import Produit
 
+from tags.models import Tag
+from analytics.models import TagView
+
 # Create your views here.
 
 
@@ -130,11 +133,32 @@ def update_produit(request, object_id =None, slug=None):
 
 
 def detail_produit(request, object_id, slug):
+
+	context = {}
 	produit = get_object_or_404(Produit, id=object_id, slug=slug)
 
-	context = {
-		"produit": produit,
-	}
+	filepath = os.path.join(settings.PROTECTED_ROOT, produit.media.path)
+	route = filepath.split(".")
+	extention = route[-1]
+	# print(route)
+
+	# print(type(filepath))
+
+
+	print (extention)
+	if extention == "jpg" or extention == "png" or extention == "gif":
+		preview = True
+
+		context["preview"] =preview
+
+	elif extention != "jpg" or extention != "png" or extention != "gif":
+		preview = False
+
+		context["preview"] =preview
+
+
+	context["produit"] =produit
+	# print(context)
 
 	return render(request, "produits/detail_produit.html",  context )
 
@@ -147,7 +171,7 @@ class ProduitListView(ListView):
 
 	def get_context_data(self, **kwargs):
 		context = super(ProduitListView, self).get_context_data(**kwargs)
-		print (context)
+		# print (context)
 		return context
 
 	def get_queryset(self, *args, **kwargs):
@@ -180,6 +204,21 @@ class ProduitDetailView(MultiSlugMixin,DetailView):
 	model = Produit
 
 
+	def get_context_data(self, *args, **kwargs):
+
+		context = super(ProduitDetailView, self).get_context_data(*args, **kwargs)
+		obj = self.get_object()
+		tags = obj.tag_set.all()
+		for tag in tags:
+			new_tag = TagView.objects.add_count(self.request.user, tag)
+			# new_tag = TagView.objects.get_or_create(user=self.request.user,
+			# 										tag=tag)[0]
+			# new_tag.count +=1
+			# new_tag.save()
+
+		return  context
+
+
 
 
 class ProduitCreateView(LoginRequiredMixin,CreateView, SubmitBtnMixin):
@@ -198,11 +237,20 @@ class ProduitCreateView(LoginRequiredMixin,CreateView, SubmitBtnMixin):
 		valid_data = super(ProduitCreateView, self).form_valid(form)
 		form.instance.managers.add(user)
 
+		tags = form.cleaned_data.get("tags")
+		if tags:
+			tags_list = tags.split(",")
+
+			for tag in tags_list:
+				if not tag == " ":
+					new_tag = Tag.objects.get_or_create(title=str(tag).strip())[0]
+					new_tag.produits.add(form.instance)
+
 		return valid_data
 
 
 	def get_success_url(self):
-		return reverse("produits:list_produit")
+		return reverse("produits:list")
 
 
 
@@ -216,8 +264,33 @@ class ProduitUpdateView(LoginRequiredMixin,MultiSlugMixin, SubmitBtnMixin, Updat
 	submit_btn = "Update produit"
 
 
+	def get_initial(self):
+
+		initial = super(ProduitUpdateView, self).get_initial()
+		print(initial)
+		tags = self.get_object().tag_set.all()
+
+		initial["tags"] =  ", ".join([x.title for x in tags])
+
+		return initial
+
+	def form_valid(self, form):
+		valid_data = super(ProduitUpdateView, self).form_valid(form)
+		print(form.cleaned_data)
+		tags = form.cleaned_data.get("tags")
+		obj = self.get_object()
+		obj.tag_set.clear()
+		if tags:
+			tags_list = tags.split(",")
+			for tag in tags_list:
+				if not tag == " ":
+
+					new_tag = Tag.objects.get_or_create(title=str(tag).strip())[0]
+					new_tag.produits.add(self.get_object())
+		return valid_data
+
 	# def get_object(self, *args, **kwargs):
-	# 	user = self.request.user
+	# 	user = self.request.us																					²er
 	# 	obj = super(ProduitUpdateView, self).get_object(*args, **kwargs)
 	# 	if obj.user == user or user in obj.managers.all():
 	# 		return obj
@@ -250,20 +323,21 @@ class ProduitDownloadView(MultiSlugMixin, DetailView):
 
 			# print(type(filepath))
 			guessed_type = guess_type(filepath)[0]
-			print(guessed_type)
+			# print(guessed_type)
 
 			# wrapper = FileResponse(file(filepath)) #ça na marche que pour python2
-			wrapper = FileResponse(open(filepath, "rb"))
+			wrapper = FileResponse(open(filepath, "rb")) # A ne pas oublier le b pour l'encodage
 			mimetype = "application/force-download"
 
 			if guessed_type:
 				mimetype = guessed_type
 
 			# response = HttpResponse(file(filepath), content_type="application/force-download") #ça ne marche avec python 3
-			response = HttpResponse(wrapper, content_type=mimetype) # A ne pas oublier le b pour l'encodage
+			response = HttpResponse(wrapper, content_type=mimetype) 
 
 			if not request.GET.get("preview"):
 				response["Content-Disposition"]= "attachement; filename=%s"%(obj.media.name) #Permet de gérer le nom du fichier en téléchargement, si on utilise pas cette fonction le fichier prend le nom par défaut 'tétéchargement' pour un système de nom en français et download pour les anglofone
+					
 			response["X-SendFile"] = str(obj.media.name)
 			return response
 

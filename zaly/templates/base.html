@@ -3,19 +3,92 @@
 <html>
 <head>
 	<title>Alléluia</title>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+
+
 
 	<style type="text/css">
 		.main-content {
 			width: 800px;
 			margin: 0 auto;
+			clear: both;
+		}
+
+
+		.main-nav{
+			width: 800px;
+			margin: 10px auto;
+		}
+
+		.main-nav li {
+			display: inline;
 		}
 		
 
+		.pull-right{
+			float: right;
+		}
+
+		.pull-left{
+			float: left;
+		}
+
+		.first-nav{
+			padding: 0px;
+		}
+
+		.col-primary{
+			width: 85%;
+		}
+
+		.col-sidebar{
+			padding-top: 20px;
+			width: 15%;
+		}
+
+		.clearfix{
+
+		}
+
+
+		#purchace-btn{
+			color: red;
+		}
+
+		button.buy-btn{
+			border: 1px solid #DA5B00 !important;
+
+			background: #DA5B00 !important;
+		}
+
+		button .buy-btn .ui-button-text{
+			color: #fff;
+		}
+
+		.ui-widget-header{
+			border: 1px solid #ffffff !important;
+			background: #ffffff !important;
+		}
 		{% block style %}{% endblock style %}
 	</style>
 </head>
 <body>
+	<nav class="main-nav">
+		<ul class="pull-left">
+			<li><a href="{% url 'dashboard:dashboard' %}">Digital Marketplace</a></li>
+		</ul>
+
+		<ul class="pull-right first-nav">
+			<li><a href="{% url 'produits:list' %}">Produits</a></li>
+
+			<li><a href="{% url 'tags:list' %}">Tags</a></li>
+			<li><a href="#">Library</a></li>
+
+
+		</ul>
+		
+	</nav>
 
 	<div class="main-content">
 		{% block content %}
@@ -28,5 +101,24 @@
 	{% block footer %}
 		<h3>C'est maintenant ou jamais</h3>
 	{% endblock %}
+
+	<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+	<script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+
+	<script type="text/javascript" src="{% static 'js/django.csrf.js' %}">
+		
+	</script>
+
+	<script type="text/javascript">
+		  $( function() {
+
+		  	{% block jquery %}
+
+		  	{% endblock jquery %}
+  } );
+		
+	</script>
 </body>
 </html>

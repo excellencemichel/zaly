@@ -23,14 +23,17 @@ from django.urls import include, path
 
 
 from .views import home, detail
+from dashboard.views import DashboardView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
 
-    path("", home, name="home"),
+    
+    path("home", home, name="home"),
     path("detail/", detail, name="detail"),
+
 
 
     path('profile/', include("profile.urls", namespace="profile")),
@@ -38,6 +41,15 @@ urlpatterns = [
 
 
     path('produits/', include("produits.urls", namespace="produits")),
+    path('tags/', include("tags.urls", namespace="tags")),
+
+    path('checkout/', include("checkout.urls", namespace="checkout")),
+    path('', include("dashboard.urls", namespace="dashboard")),
+    path('seller/', include("sellers.urls", namespace="sellers")),
+
+
+
+
 
 
 

@@ -8,7 +8,17 @@
 <p>{{ produit.description }}</p>
 
 
-<p>Une</p>
 
+
+{% if request.user.is_authenticated and produit.media and produit in request.user.myproduits.produits.all %}
+		{% if preview %}
+		<p><a href="{{ produit.get_download }}?preview=True">Preview</a></p>
+
+		{% endif %}
+
+		<p><a href="{{ produit.get_download }}">Download</a></p>
+
+
+{% endif %}
 
 {% endblock %}

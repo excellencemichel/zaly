@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load get_thumbnail %}
+
+{% block content %}
+
+<ul>
+	{% for produit_instance in object.produits.all %}
+   		 <li>
+				<!-- {{ produit_instance.thumbnail_set.all }}
+
+				{{ produit_instance.thumbnail_set.all.first }}
+
+				{{ produit_instance.thumbnail_set.all.first.media}}
+ -->
+				<a href="{{ produit_instance.get_absolute_url }}"><img src="{{ produit_instance|get_thumbnail:'micro' }}" /></a>
+
+		</li>
+
+
+ 	{% empty %}
+ 		<li>Not Tags yet .</li>
+
+	{% endfor %}
+</ul>
+
+
+
+
+
+{% endblock content %}

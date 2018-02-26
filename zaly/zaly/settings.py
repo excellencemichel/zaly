@@ -43,13 +43,23 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
 
     'crispy_forms',
-     
-    'accounts',
     'profile',
+
+    'billing',
+    'checkout',
+
+    'dashboard',
+
+    'analytics',
+
+    'accounts',
 
     'market',
     'produits',
 
+    'sellers',
+
+    'tags',
 
 
 ]

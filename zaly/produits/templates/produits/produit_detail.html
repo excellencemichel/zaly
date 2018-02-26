@@ -1,17 +1,138 @@
 {% extends "base.html" %}
 
+
+	<script type="text/javascript">
+		  $( function() {
+
+		  	{% block jquery %}
+
+		  		$("#purchace-btn").click(function(event){
+		  			event.preventDefault()
+		  			var purchaceBtn = $(this)
+		  			$("#dialog-confirm").fadeIn("300")
+
+		  			$("#dialog-confirm").dialog({
+		  				resizable : false,
+		  				height:250,
+		  				width:350,
+		  				modal: true,
+
+		  				buttons: {
+		  					1 : { 
+		  					id : "close",
+		  					text: "Confirm",
+		  					click: function(){
+		  						console.log("Confirm"),
+
+		  						$(this).dialog("close")
+
+
+		  		var request = $.ajax({
+				  			method : "POST",
+				  			url : "{% url 'checkout:checkout' %}",
+
+				  			data: {
+				  				produit_id : "{{ object.id }}",
+				  			}
+
+
+				  		})
+
+				  		request.done(function(data){
+				  			console.log(data.download)
+				  			console.log(data.preview)
+
+
+				  			purchaceBtn.before("<p><a href='" + data.download + "'>Download</a></p><p><a href='" + data.preview + "'>Preview</a></p>")
+				  			// console.log("Working ... !")
+				  			// if (data.works) {
+				  			// 	$("#content").html(data.time)
+				  			// }
+				  			purchaceBtn.fadeOut(100)
+				  		})
+
+				  		request.fail(function(jqXHR, textStatus){
+
+				  			if(jqXHR.status == 404){
+				  				alert("Page not found !")
+				  			} else if(jqXHR.status == 403){
+				  				alert("You must be logged in to do this!")
+				  			}
+				  			else{
+				  				alert("There was an error with your request. Please try again.")
+
+				  			}
+				  		})
+
+		  					},
+		  					 class : "buy-btn"
+		  				},
+
+		  			2 : {
+		  					id : "close",
+		  					text: "Cancel",
+		  					click: function(){
+		  						$(this).dialog("close")
+		  					},
+		  					 class : "cancel-btn"
+		  				}
+
+		  			}
+
+		  			})
+		  		})
+
+		  	{% endblock jquery %}
+  			} );
+		
+	</script>
+
 {% block content %}
-	<strong>{{ object.title }}</strong>
-	<p>{{ object.description }}</p>
-
-	<p>{{ object.price }}</p>
-
-	{% if request.user.is_authenticated and object.media and object in request.user.myproduits.produits.all %}
-	
-		<p><a href="{{ object.get_download }}?preview=True">Preview</a></p>
-		<p><a href="{{ object.get_download }}">Download</a></p>
 
 
-	{% endif %}
+	<div class="col-primary pull-left">
+		<h1>Produit: {{ object.title }}</h1>
+		<p>{{ object.description }}</p>
+
+		<p>{{ object.price }}</p>
+
+
+		{% for img in object.thumbnail_set.all %}
+
+			{% if img.media %}
+
+				<img src="{{ img.media.url }}">
+
+			{% endif %}
+
+		{% endfor %}
+
+	</div>
+
+	<div class="col-sidebar pull-right">
+
+		{% if request.user.is_authenticated and object.media and object in request.user.myproduits.produits.all %}
+			<p><a href="{{ object.get_download }}?preview=True">Preview</a></p>
+
+
+			<p><a href="{{ object.get_download }}">Download</a></p>
+
+
+			{% else %}
+
+			<p><a id="purchace-btn" href="#">Purchase</a></p>
+
+			<div id="dialog-confirm" title="Confirm Purchase" style="display: none;">
+				<p>Your card on file will be charges after you agree bellow.</p>
+			</div>
+
+
+		{% endif %}
+
+	</div>
+
+	<div class="clearfix">
+		
+	</div>
 
 {% endblock content %}

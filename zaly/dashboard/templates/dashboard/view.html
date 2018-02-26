@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+	<div>
+		<h1>Suggested produits</h1>
+
+			{% include "produits/produit_snippet.html" with produit_list=produits %}
+	</div>
+			{% for produit in produits %}
+			{{ request.build_absolute_uri }} 
+
+			<a href="{{ produit.get_absolute_url }}">Link </a>
+			<p>{{ produit.title }}</p>
+			<img src="{{ produit.media.url }}">
+<br>
+
+			{% endfor %}
+
+	<div>
+		<h1>Top Tgs</h1>
+		<ul>
+		{% for tag in top_tags %}
+
+		
+				<li><a href="{{ tag.get_absolute_url }}">{{ tag }}</a></li>
+			{% endfor %}
+		</ul>
+
+	</div>
+
+{% endblock %}
